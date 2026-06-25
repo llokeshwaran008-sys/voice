@@ -18,7 +18,12 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Allow any frontend port to connect
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type']
+}));
+app.options('/{*splat}', cors());
 app.use(express.json({ limit: '500mb' }));
 
 // Cache the model so it only loads once
