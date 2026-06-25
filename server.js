@@ -1,12 +1,21 @@
 import express from 'express';
 import cors from 'cors';
 import { pipeline, env } from '@xenova/transformers';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import fs from 'fs';
+
+// Load .env in development
+import 'dotenv/config';
 
 // Tell transformers.js to run in Node.js environment
 env.allowLocalModels = false;
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Allow any frontend port to connect
 app.use(cors());
@@ -186,8 +195,19 @@ app.post('/translate', async (req, res) => {
   }
 });
 
+// ─── Serve React frontend in production ───────────────────────────────────
+const distPath = join(__dirname, 'dist');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  // For any route not matched by API, send React's index.html
+  app.get('*', (req, res) => {
+    res.sendFile(join(distPath, 'index.html'));
+  });
+  console.log('📦 Serving static React build from /dist');
+}
+
 app.listen(PORT, () => {
-  console.log(`🚀 Free Local Translation Server running at http://localhost:${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
   console.log(`   GET    /progress/:id  → SSE live progress stream`);
   console.log(`   POST   /translate     → Transcribes & translates audio`);
   console.log(`   DELETE /cancel/:id    → Cancels a running session`);

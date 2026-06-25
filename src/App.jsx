@@ -23,7 +23,10 @@ import {
 } from 'lucide-react';
 import './index.css';
 
-const SERVER_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// In production (Render), frontend & backend are on the same origin.
+// In dev, use localhost:3001.
+const SERVER_URL = import.meta.env.VITE_API_URL ||
+  (window.location.hostname === 'localhost' ? 'http://localhost:3001' : '');
 
 const LANGUAGES = [
   { code: 'tamil', label: 'Tamil', flag: '🇮🇳' },
