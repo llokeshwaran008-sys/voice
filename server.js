@@ -200,7 +200,7 @@ const distPath = join(__dirname, 'dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
   // For any route not matched by API, send React's index.html
-  app.get('*', (req, res) => {
+  app.use((req, res) => {
     res.sendFile(join(distPath, 'index.html'));
   });
   console.log('📦 Serving static React build from /dist');
